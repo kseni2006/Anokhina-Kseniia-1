@@ -2,58 +2,62 @@ import tkinter as tk
 from tkinter import messagebox
 
 
-def round_narrow(x, delta):
-    return round(x, 2)
+def round_value_narrow(value, uncertainty):
+    if uncertainty < 0.05:
+        return round(value, 1)
+    return round(value)
 
 
-def round_broad(x, delta_percent):
-    delta = delta_percent / 100
-    x_rounded = round(x * (1 - delta), 2)
-    return x_rounded
+def round_value_broad(value, percent_error):
+    uncertainty = value * (percent_error / 100)
+    return round(value - uncertainty, 2)
 
 
-def task2():
+def perform_rounding():
     try:
-        x = float(entry_x.get())
-        rounding_choice = rounding_mode.get()
+        value = float(value_entry.get())
+        rounding_mode = mode.get()
 
-        if rounding_choice == 'narrow':
-            delta = float(entry_delta.get())
-            x_narrow = round_narrow(x, delta)
-            result_task2.set(f"Округлене число (вузьке) = {x_narrow}")
-        elif rounding_choice == 'broad':
-            delta_percent = float(entry_delta_percent.get())
-            x_broad = round_broad(x, delta_percent)
-            result_task2.set(f"Округлене число (широке) = {x_broad}")
-        else:
-            messagebox.showerror("Помилка", "Оберіть режим округлення.")
+        if rounding_mode == 'narrow':
+            uncertainty = float(uncertain_entry.get())
+            rounded_value = round_value_narrow(value, uncertainty)
+            result_text.set(f"Округлене (вузьке): {rounded_value}")
+        elif rounding_mode == 'broad':
+            percent_error = float(uncertain_percent_entry.get())
+            rounded_value = round_value_broad(value, percent_error)
+            result_text.set(f"Округлене (широке): {rounded_value}")
     except ValueError:
-        messagebox.showerror("Помилка", "Перевірте правильність введених значень!")
+        messagebox.showerror("Помилка", "Невірні дані!")
 
 
-root = tk.Tk()
-root.title("Завдання 2: Округлення числа")
-root.geometry("400x300")
+# Інтерфейс
+app = tk.Tk()
+app.title("Округлення значень")
+app.geometry("400x300")
+app.configure(bg="#e6f2ff")  # Зміна кольору фону
 
-tk.Label(root, text="Число (x):").pack(pady=5)
-entry_x = tk.Entry(root)
-entry_x.pack()
+font_large = ("Arial", 14)
+font_medium = ("Arial", 12)
 
-rounding_mode = tk.StringVar(value='narrow')
-tk.Radiobutton(root, text="Вузьке", variable=rounding_mode, value='narrow').pack()
-tk.Radiobutton(root, text="Широке", variable=rounding_mode, value='broad').pack()
+tk.Label(app, text="Число:", bg="#e6f2ff", font=font_medium).pack(pady=10)
+value_entry = tk.Entry(app, font=font_medium)
+value_entry.pack()
 
-tk.Label(root, text="Абсолютна похибка (delta):").pack(pady=5)
-entry_delta = tk.Entry(root)
-entry_delta.pack()
+mode = tk.StringVar(value='narrow')
+tk.Radiobutton(app, text="Вузьке", variable=mode, value='narrow', bg="#e6f2ff", font=font_medium).pack(pady=5)
+tk.Radiobutton(app, text="Широке", variable=mode, value='broad', bg="#e6f2ff", font=font_medium).pack(pady=5)
 
-tk.Label(root, text="Відсоткова похибка (delta%):").pack(pady=5)
-entry_delta_percent = tk.Entry(root)
-entry_delta_percent.pack()
+tk.Label(app, text="Абсолютна похибка:", bg="#e6f2ff", font=font_medium).pack(pady=10)
+uncertain_entry = tk.Entry(app, font=font_medium)
+uncertain_entry.pack()
 
-result_task2 = tk.StringVar()
-tk.Label(root, textvariable=result_task2).pack(pady=5)
+tk.Label(app, text="Відсоткова похибка:", bg="#e6f2ff", font=font_medium).pack(pady=10)
+uncertain_percent_entry = tk.Entry(app, font=font_medium)
+uncertain_percent_entry.pack()
 
-tk.Button(root, text="Виконати завдання 2", command=task2).pack(pady=5)
+result_text = tk.StringVar()
+tk.Label(app, textvariable=result_text, bg="#e6f2ff", font=font_medium, fg="blue").pack(pady=20)
 
-root.mainloop()
+tk.Button(app, text="Округлити", command=perform_rounding, bg="#0066cc", fg="white", font=font_large).pack(pady=10)
+
+app.mainloop()

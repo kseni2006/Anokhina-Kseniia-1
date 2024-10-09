@@ -2,52 +2,48 @@ import tkinter as tk
 from tkinter import messagebox
 
 
-def calculate_delta_narrow(x):
-    decimal_places = len(str(x).split(".")[1]) if "." in str(x) else 0
+def compute_error(value, mode):
+    decimal_places = len(str(value).split(".")[1]) if "." in str(value) else 0
     last_digit_value = 10 ** (-decimal_places)
-    return last_digit_value / 2
 
-
-def calculate_delta_broad(x):
-    decimal_places = len(str(x).split(".")[1])
-    last_digit_value = 10 ** (-decimal_places)
+    if mode == 'narrow':
+        return last_digit_value / 2
     return last_digit_value
 
 
-def task3():
+def show_errors():
     try:
-        x = float(entry_x_task3.get())
-        choice = error_mode.get()
+        value = float(entry_value.get())
+        error_mode = mode_choice.get()
 
-        if choice == 'narrow':
-            delta_narrow = calculate_delta_narrow(x)
-            relative_error = delta_narrow / x
-            result_task3.set(f"Абсолютна похибка (вузьке) = {delta_narrow:.4f}, Відносна похибка = {relative_error * 100:.4f}%")
-        elif choice == 'broad':
-            delta_broad = calculate_delta_broad(x)
-            relative_error = delta_broad / x
-            result_task3.set(f"Абсолютна похибка (широке) = {delta_broad:.4f}, Відносна похибка = {relative_error * 100:.4f}%")
-        else:
-            messagebox.showerror("Помилка", "Оберіть тип похибки.")
+        abs_error = compute_error(value, error_mode)
+        relative_error = (abs_error / value) * 100
+
+        result_text.set(f"Абс. похибка = {abs_error:.5f}, Відносна похибка = {relative_error:.5f}%")
     except ValueError:
-        messagebox.showerror("Помилка", "Перевірте правильність введених значень!")
+        messagebox.showerror("Помилка", "Перевірте правильність введених даних!")
 
 
-root = tk.Tk()
-root.title("Завдання 3: Обчислення похибок")
-root.geometry("400x200")
+# Інтерфейс
+app = tk.Tk()
+app.title("Розрахунок похибок")
+app.geometry("400x250")
+app.configure(bg="#e6f2ff")
 
-tk.Label(root, text="Число (x):").pack(pady=5)
-entry_x_task3 = tk.Entry(root)
-entry_x_task3.pack()
+font_large = ("Arial", 14)
+font_medium = ("Arial", 12)
 
-error_mode = tk.StringVar(value='narrow')
-tk.Radiobutton(root, text="Вузьке", variable=error_mode, value='narrow').pack()
-tk.Radiobutton(root, text="Широке", variable=error_mode, value='broad').pack()
+tk.Label(app, text="Значення:", bg="#e6f2ff", font=font_medium).pack(pady=10)
+entry_value = tk.Entry(app, font=font_medium)
+entry_value.pack()
 
-result_task3 = tk.StringVar()
-tk.Label(root, textvariable=result_task3).pack(pady=5)
+mode_choice = tk.StringVar(value='narrow')
+tk.Radiobutton(app, text="Вузьке", variable=mode_choice, value='narrow', bg="#e6f2ff", font=font_medium).pack(pady=5)
+tk.Radiobutton(app, text="Широке", variable=mode_choice, value='broad', bg="#e6f2ff", font=font_medium).pack(pady=5)
 
-tk.Button(root, text="Виконати завдання 3", command=task3).pack(pady=5)
+result_text = tk.StringVar()
+tk.Label(app, textvariable=result_text, bg="#e6f2ff", font=font_medium, fg="blue").pack(pady=20)
 
-root.mainloop()
+tk.Button(app, text="Обчислити похибку", command=show_errors, bg="#0066cc", fg="white", font=font_large).pack(pady=10)
+
+app.mainloop()
